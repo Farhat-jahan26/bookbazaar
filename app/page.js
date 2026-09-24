@@ -1,69 +1,77 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../lib/firebase";
+import Link from "next/link";
 
 export default function Home() {
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchBooks() {
+      const snapshot = await getDocs(collection(db, "books"));
+      const booksList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setBooks(booksList);
+      setLoading(false);
+    }
+    fetchBooks();
+  }, []);
+
+  if (loading) return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading books...</p>;
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.js</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div style={{ padding: "20px" }}>
+      <h1 style={{ textAlign: "center" }}>BookBazaar</h1>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+          gap: "20px",
+          marginTop: "30px",
+        }}
+      >
+        {books.map((book) => (
+          <Link
+            key={book.id}
+            href={`/books/${book.id}`}
+            style={{ textDecoration: "none", color: "inherit" }}
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            <div
+              style={{
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                padding: "10px",
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  aspectRatio: "2 / 3",
+                  overflow: "hidden",
+                  borderRadius: "4px",
+                  backgroundColor: "#f5f5f5",
+                }}
+              >
+                <img
+                  src={book.imageUrl}
+                  alt={book.title}
+                  onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/220x330?text=No+Cover"; }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+              <h3 style={{ fontSize: "16px", margin: "10px 0 5px" }}>{book.title}</h3>
+              <p style={{ fontSize: "14px", color: "#555", margin: "0 0 5px" }}>{book.author}</p>
+              <p style={{ fontWeight: "bold" }}>₹{book.price}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
