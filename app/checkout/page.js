@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, increment, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
 import { useCart } from "../../context/CartContext";
 import { useEffect } from "react";
@@ -44,6 +44,12 @@ export default function Checkout() {
         status: "placed",
         createdAt: serverTimestamp(),
       });
+      // Stock ghatao har book ka
+      for (const item of cart) {
+        await updateDoc(doc(db, "books", item.id), {
+          stock: increment(-item.quantity),
+        });
+      }
       clearCart();
       router.push("/orders");
     } catch (err) {

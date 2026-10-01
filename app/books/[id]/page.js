@@ -12,6 +12,8 @@ export default function BookDetail() {
   const { addToCart } = useCart();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
+  const [confirmation, setConfirmation] = useState("");
 
   useEffect(() => {
     async function fetchBook() {
@@ -24,6 +26,13 @@ export default function BookDetail() {
     }
     fetchBook();
   }, [id]);
+
+  function handleAddToCart() {
+    addToCart(book, quantity);
+    setConfirmation(`${quantity} ${quantity === 1 ? "copy" : "copies"} added to cart ✅`);
+    setTimeout(() => setConfirmation(""), 2000);
+    setQuantity(1);
+  }
 
   if (loading) return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading...</p>;
   if (!book) return <p style={{ textAlign: "center", marginTop: "50px" }}>Book not found.</p>;
@@ -40,6 +49,7 @@ export default function BookDetail() {
         <img
           src={book.imageUrl}
           alt={book.title}
+          onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/250x350?text=No+Cover"; }}
           style={{ width: "250px", height: "350px", objectFit: "cover", borderRadius: "8px" }}
         />
         <div style={{ flex: 1, minWidth: "250px" }}>
@@ -51,21 +61,46 @@ export default function BookDetail() {
           <p style={{ marginTop: "10px", color: book.stock > 0 ? "green" : "red" }}>
             {book.stock > 0 ? `In Stock (${book.stock} left)` : "Out of Stock"}
           </p>
-          <button
-            onClick={() => addToCart(book)}
-            style={{
-              marginTop: "20px",
-              padding: "12px 24px",
-              backgroundColor: "#1F3A5F",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontSize: "16px",
-            }}
-          >
-            Add to Cart
-          </button>
+
+          {book.stock > 0 && (
+            <>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "20px" }}>
+                <button
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  style={{ padding: "6px 14px", cursor: "pointer", fontSize: "16px" }}
+                >
+                  -
+                </button>
+                <span style={{ fontSize: "16px", minWidth: "20px", textAlign: "center" }}>{quantity}</span>
+                <button
+                  onClick={() => setQuantity((q) => Math.min(book.stock, q + 1))}
+                  style={{ padding: "6px 14px", cursor: "pointer", fontSize: "16px" }}
+                >
+                  +
+                </button>
+              </div>
+
+              <button
+                onClick={handleAddToCart}
+                style={{
+                  marginTop: "15px",
+                  padding: "12px 24px",
+                  backgroundColor: "#1F3A5F",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontSize: "16px",
+                }}
+              >
+                Add to Cart
+              </button>
+
+              {confirmation && (
+                <p style={{ color: "green", marginTop: "10px", fontWeight: "bold" }}>{confirmation}</p>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

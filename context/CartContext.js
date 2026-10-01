@@ -22,17 +22,17 @@ export function CartProvider({ children }) {
     }
   }, [cart, loaded]);
 
-  function addToCart(book) {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === book.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.id === book.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prev, { ...book, quantity: 1 }];
-    });
-  }
+  function addToCart(book, qty = 1) {
+  setCart((prev) => {
+    const existing = prev.find((item) => item.id === book.id);
+    if (existing) {
+      return prev.map((item) =>
+        item.id === book.id ? { ...item, quantity: item.quantity + qty } : item
+      );
+    }
+    return [...prev, { ...book, quantity: qty }];
+  });
+}
 
   function removeFromCart(id) {
     setCart((prev) => prev.filter((item) => item.id !== id));
