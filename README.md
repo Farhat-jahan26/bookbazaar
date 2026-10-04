@@ -5,7 +5,7 @@ BookBazaar is a full-stack online book store where users can browse books by cat
 This is a demo store — orders are saved in the database, but no real payment is taken.
 
 ## Live Demo
-[https://bookbazaar-taupe.vercel.app/]
+https://bookbazaar-farhat.vercel.app/
 
 ## Features
 
