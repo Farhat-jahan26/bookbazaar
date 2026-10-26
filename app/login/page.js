@@ -43,6 +43,9 @@ export default function Login() {
           required
           style={{ padding: "10px" }}
         />
+        <div style={{ textAlign: "right", fontSize: "14px" }}>
+          <Link href="/forgot-password">Forgot password?</Link>
+        </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
         <button type="submit" style={{ padding: "12px", backgroundColor: "#1F3A5F", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}>
           Login
